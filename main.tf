@@ -1,15 +1,13 @@
-# data "template_file" "aws_iam_assume_role_policy" {
-#   template_file = "${file("${path.module}/aws_iam_assume_role_policy.tpl")}"
+resource "aws_iam_role" "role" {
+  name               = "${var.aws_iam_role_name}"
+  assume_role_policy = "${data.aws_iam_policy_document.assume_role_policy.json}"
+}
 
-#   vars {
-#     epsagon_account_id  = "${var.epsagon_account_id}"
-#     epsagon_external_id = "${var.epsagon_external_id}"
-#   }
-# }
-
-# data "template_file" "aws_iam_role_policy" {
-#   template = "${file("${path.module}/aws_iam_role_policy.tpl")}"
-# }
+resource "aws_iam_role_policy" "role" {
+  name   = "${var.aws_iam_role_name}"
+  role   = "${aws_iam_role.role.id}"
+  policy = "${data.aws_iam_policy_document.role_policy.json}"
+}
 
 data "aws_iam_policy_document" "assume_role_policy" {
   statement {
@@ -55,15 +53,4 @@ data "aws_iam_policy_document" "role_policy" {
 
     resources = ["*"]
   }
-}
-
-resource "aws_iam_role" "role" {
-  name               = "${var.aws_iam_role_name}"
-  assume_role_policy = "${data.aws_iam_policy_document.assume_role_policy.json}"
-}
-
-resource "aws_iam_role_policy" "role" {
-  name   = "${var.aws_iam_role_name}"
-  role   = "${aws_iam_role.role.id}"
-  policy = "${data.aws_iam_policy_document.role_policy.json}"
 }
